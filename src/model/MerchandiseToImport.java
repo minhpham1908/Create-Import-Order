@@ -6,14 +6,11 @@ import java.util.Date;
 
 public class MerchandiseToImport extends Merchandise {
 	private int merchandiseToImportCode;
-		private int numberRequire;
+	private int numberRequire;
 	private LocalDateTime dayShipRequire;
-
-	
 
 	public MerchandiseToImport() {
 	}
-
 
 	public int getNumberRequire() {
 		return numberRequire;
@@ -23,11 +20,9 @@ public class MerchandiseToImport extends Merchandise {
 		return dayShipRequire;
 	}
 
-
 	public void setDayShipRequire(LocalDateTime dayShipRequire) {
 		this.dayShipRequire = dayShipRequire;
 	}
-
 
 	public void setNumberRequire(int numberRequire) {
 		this.numberRequire = numberRequire;
@@ -36,7 +31,6 @@ public class MerchandiseToImport extends Merchandise {
 	public int getMerchandiseToImportCode() {
 		return merchandiseToImportCode;
 	}
-
 
 	public void setMerchandiseToImportCode(int merchandiseToImportCode) {
 		this.merchandiseToImportCode = merchandiseToImportCode;

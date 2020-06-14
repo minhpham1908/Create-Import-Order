@@ -2,6 +2,7 @@ package util;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -11,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import model.MerchandiseToImport;
+import model.Site;
 
 public class SQLConnect {
 	public Connection connect() {
@@ -40,6 +42,7 @@ public class SQLConnect {
 				LocalDateTime dayShipRequire = TimeProcessor.UnixToLocalDateTime(timestampInSecond);
 
 				MerchandiseToImport merch = new MerchandiseToImport();
+				merch.setId(rs.getInt(Tukhoa.MERCHANDISE_ID));
 				merch.setMerchandiseToImportCode(rs.getInt(Tukhoa.MERCHANDISE_TO_IMPORT_ID));
 				merch.setCode(rs.getString(Tukhoa.MERCHANDISE_CODE));
 				merch.setName(rs.getString(Tukhoa.MERCHANDISE_NAME));
@@ -58,17 +61,17 @@ public class SQLConnect {
 
 	public MerchandiseToImport getMerchandiseToImport(int merchandiseToOrderId) {
 		MerchandiseToImport merch = null;
-		String sql = "SELECT * from MerchandiseToImport, Merchandise where MerchandiseToImport.merchCode = Merchandise.merchCode and merchandiseToImportId =\""
-				+ merchandiseToOrderId + "\"";
-		try (Connection conn = this.connect();
-				Statement stmt = conn.createStatement();
-				ResultSet rs = stmt.executeQuery(sql)) {
+		String sql = "SELECT * from MerchandiseToImport, Merchandise where MerchandiseToImport.merchCode = Merchandise.merchCode and merchandiseToImportId = ?";
+		try (Connection conn = this.connect(); PreparedStatement pstmt = conn.prepareStatement(sql);) {
+			pstmt.setInt(1, merchandiseToOrderId);
+			ResultSet rs = pstmt.executeQuery();
 
 			while (rs.next()) {
 				int timestampInSecond = rs.getInt("desired_delivery_date");
 				LocalDateTime dayShipRequire = TimeProcessor.UnixToLocalDateTime(timestampInSecond);
 
 				merch = new MerchandiseToImport();
+				merch.setId(rs.getInt(Tukhoa.MERCHANDISE_ID));
 				merch.setMerchandiseToImportCode(rs.getInt(Tukhoa.MERCHANDISE_TO_IMPORT_ID));
 				merch.setCode(rs.getString(Tukhoa.MERCHANDISE_CODE));
 				merch.setName(rs.getString(Tukhoa.MERCHANDISE_NAME));
@@ -84,27 +87,47 @@ public class SQLConnect {
 
 	}
 
-//	public static void main(String[] args) {
-//		System.out.println("Hello");
-//		SQLConnect sqlConnect = new SQLConnect();
-//		MerchandiseToImport merch = sqlConnect.GetMerchandiseToImport();
-//		sqlConnect.PrintRes(merch);
-//
-//		System.out.println();
-//	}
+	public List<Site> getSitesInfoThatSellTheMerchandie(int merchandiseId) {
+		List<Site> sites = new ArrayList<Site>();
+		String query = "SELECT * FROM Site, SellingMerchandise, Merchandise WHERE Site.siteId = SellingMerchandise.siteId and SellingMerchandise.merchId = Merchandise.merchId and  Merchandise.merchId = ?";
+		try (Connection conn = this.connect(); PreparedStatement pstmt = conn.prepareStatement(query);) {
+			pstmt.setInt(1, merchandiseId);
+			ResultSet rs = pstmt.executeQuery();
+
+			while (rs.next()) {
+				Site site = new Site();
+				site.setSiteName(rs.getString(Tukhoa.SITE_NAME));
+				site.setid(rs.getInt(Tukhoa.SITE_ID));
+				site.setTransportation(rs.getString(Tukhoa.SITE_TRANSPORTATION));
+				site.setNumberOfDayTransporting(rs.getInt(Tukhoa.SITE_TRANSPORTDAY));
+				site.setSellingMerchandiseStock(rs.getInt(Tukhoa.MERCH_QUANTITY));
+				site.setSellingMerchandiseId(rs.getInt(Tukhoa.MERCHANDISE_ID));
+				sites.add(site);
+
+			}
+		} catch (SQLException e) {
+			System.err.println(e.getMessage());
+		}
+		return sites;
+	}
 
 	public static void PrintResList(List<MerchandiseToImport> lista) {
-		for (int i = 0; i < lista.size(); i++) {
-			MerchandiseToImport merch = lista.get(i);
+		for (MerchandiseToImport merch : lista) {
 			PrintRes(merch);
 		}
 	}
 
 	public static void PrintRes(MerchandiseToImport merch) {
-
-		System.out.print(merch.getCode() + " | " + merch.getName() + " | " + merch.getNumberRequire() + " | "
-				+ merch.getUnit() + " | "
+		System.out.print(merch.getId() + " | " + merch.getCode() + " | " + merch.getName() + " | "
+				+ merch.getNumberRequire() + " | " + merch.getUnit() + " | "
 				+ TimeProcessor.getStringLocalDateTime(merch.getDayShipRequire(), "dd MMM uuuu HH:mm:ss") + "\n");
-
 	}
+
+	public static void PrintSites(List<Site> sites) {
+		System.out.println("Thong tin cac sites");
+		for (Site site : sites) {
+			System.out.println(site);
+		}
+	}
+
 }

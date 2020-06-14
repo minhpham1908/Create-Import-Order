@@ -16,27 +16,24 @@ import javax.swing.JLabel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
+import controller.ProcessOrderController;
+import model.MerchandiseToImport;
+import model.Site;
+import util.TimeProcessor;
+
+import java.awt.Font;
+import java.util.ArrayList;
+import java.util.Observable;
+import java.util.Observer;
+import java.awt.Dimension;
+
 public class OrderView extends JDialog {
 	private JTable table;
+	private JLabel merchandiseName;
+	private String unit;
 
-	/**
-	 * Launch the application.
-	 */
-//	public static void main(String[] args) {
-//		try {
-//			OrderView dialog = new OrderView();
-//			dialog.setDefaultCloseOperation(JDialog.EXIT_ON_CLOSE);
-//			dialog.setVisible(true);
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//	}
-
-	/**
-	 * Create the dialog.
-	 */
-	@SuppressWarnings("serial")
-	public OrderView() {
+	public OrderView(ArrayList<Site> chosenSites, String unit) {
+		setAlwaysOnTop(true);
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (ClassNotFoundException e) {
@@ -54,7 +51,7 @@ public class OrderView extends JDialog {
 		}
 
 		setTitle("Đơn hàng cho ...");
-		setBounds(100, 100, 450, 300);
+		setBounds(100, 100, 600, 800);
 		getContentPane().setLayout(new BorderLayout());
 		setResizable(false);
 		{
@@ -69,36 +66,39 @@ public class OrderView extends JDialog {
 			}
 		}
 		{
-			JLabel merchandiseName = new JLabel("Sản phẩm ...");
+			merchandiseName = new JLabel("Sản phẩm ...");
+			merchandiseName.setFont(new Font("Tahoma", Font.PLAIN, 13));
 			getContentPane().add(merchandiseName, BorderLayout.NORTH);
 		}
 		{
 			JScrollPane scrollPane = new JScrollPane();
 			getContentPane().add(scrollPane, BorderLayout.CENTER);
 			{
-				table = new JTable(){
+				table = new JTable() {
 					public boolean isCellEditable(int row, int column) {
 						return false;
 					}
 				};
+				table.setPreferredScrollableViewportSize(new Dimension(600, 800));
 				table.setModel(new DefaultTableModel(new Object[][] {},
-						new String[] { "Import Site", "Quality", "Delivery by", "Delivery on" }) {
-					boolean[] columnEditables = new boolean[] { false, false, false, false };
-
-					public boolean isCellEditable(int row, int column) {
-						return columnEditables[column];
-					}
-
-					Class[] columnTypes = new Class[] { String.class, Integer.class, String.class, String.class };
+						new String[] { "Import Site", "Quality", "Unit", "Delivery by", "Delivery on" }) {
+					Class[] columnTypes = new Class[] { Object.class, Object.class, String.class, Object.class,
+							Object.class };
 
 					public Class getColumnClass(int columnIndex) {
 						return columnTypes[columnIndex];
 					}
+
+					boolean[] columnEditables = new boolean[] { false, false, true, false, false };
+
+					public boolean isCellEditable(int row, int column) {
+						return columnEditables[column];
+					}
 				});
 				table.getColumnModel().getColumn(0).setResizable(false);
 				table.getColumnModel().getColumn(1).setResizable(false);
-				table.getColumnModel().getColumn(2).setResizable(false);
 				table.getColumnModel().getColumn(3).setResizable(false);
+				table.getColumnModel().getColumn(4).setResizable(false);
 				DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
 				centerRenderer.setHorizontalAlignment(JLabel.CENTER);
 				table.setDefaultRenderer(String.class, centerRenderer);
@@ -107,11 +107,33 @@ public class OrderView extends JDialog {
 						.setHorizontalAlignment(JLabel.CENTER);
 				table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 				table.getTableHeader().setReorderingAllowed(false);
+				table.setRowHeight(40);
+				
 				scrollPane.setViewportView(table);
-				
-				
+			
+				this.unit = unit;
+
+				initTable(chosenSites);
 			}
 		}
+	}
+
+	public void setOrderLabel(String merchName, String merchCode) {
+		String label = "Đơn hàng cho sản phẩm \"" + merchName + "\" | mã sản phẩm: " + merchCode;
+		merchandiseName.setText(label);
+	}
+
+	private void initTable(ArrayList<Site> chosenSites) {
+		for (Site site : chosenSites) {
+			addChosenSites(site);
+		}
+	}
+
+	private void addChosenSites(Site site) {
+		DefaultTableModel model = (DefaultTableModel) table.getModel();
+
+		model.addRow(new Object[] { site.getSiteName(), site.getSellingMerchandiseStock(), this.unit,
+				site.getTransportation(), site.getNumberOfDayTransporting() + " ngày" });
 	}
 
 }
