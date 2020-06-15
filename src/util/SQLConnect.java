@@ -31,7 +31,7 @@ public class SQLConnect {
 
 	public List<MerchandiseToImport> getMerchandiseToImportList() {
 		List<MerchandiseToImport> merchandiseToImports = new ArrayList<MerchandiseToImport>();
-		String sql = "SELECT * FROM MerchandiseToImport, Merchandise where MerchandiseToImport.merchCode = Merchandise.merchCode";
+		String sql = "SELECT * FROM MerchandiseToImport, Merchandise where MerchandiseToImport.merchId = Merchandise.merchId";
 
 		try (Connection conn = this.connect();
 				Statement stmt = conn.createStatement();
@@ -61,7 +61,7 @@ public class SQLConnect {
 
 	public MerchandiseToImport getMerchandiseToImport(int merchandiseToOrderId) {
 		MerchandiseToImport merch = null;
-		String sql = "SELECT * from MerchandiseToImport, Merchandise where MerchandiseToImport.merchCode = Merchandise.merchCode and merchandiseToImportId = ?";
+		String sql = "SELECT * from MerchandiseToImport, Merchandise where MerchandiseToImport.merchId = Merchandise.merchId and merchandiseToImportId = ?";
 		try (Connection conn = this.connect(); PreparedStatement pstmt = conn.prepareStatement(sql);) {
 			pstmt.setInt(1, merchandiseToOrderId);
 			ResultSet rs = pstmt.executeQuery();
