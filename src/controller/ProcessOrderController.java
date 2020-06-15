@@ -45,7 +45,7 @@ public class ProcessOrderController {
 			sorter.getSortedSiteByStock();
 			List<Site> chosenSites = new ArrayList<Site>();
 			for (Site site : sites) {
-				if (site.getTransportation().equals("Air")) {
+				if (site.getTransportation().equals("Train")) {
 					chosenSites.add(site);
 				}
 			}

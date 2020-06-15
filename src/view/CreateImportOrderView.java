@@ -46,6 +46,10 @@ public class CreateImportOrderView implements Observer {
 	private JFrame frame;
 	private JTable table;
 
+	public JFrame getFrame() {
+		return frame;
+	}
+
 	private ProcessOrderController controller;
 	private List<MerchandiseToImport> merchandiseToImportList;
 	MerchandiseToImportTableModel tableModel;
@@ -53,19 +57,19 @@ public class CreateImportOrderView implements Observer {
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String[] args) {
-		
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					CreateImportOrderView window = new CreateImportOrderView();
-					window.frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
+//	public static void main(String[] args) {
+//
+//		EventQueue.invokeLater(new Runnable() {
+//			public void run() {
+//				try {
+//					CreateImportOrderView window = new CreateImportOrderView();
+//					window.frame.setVisible(true);
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//				}
+//			}
+//		});
+//	}
 
 	/**
 	 * Create the application.
@@ -99,7 +103,7 @@ public class CreateImportOrderView implements Observer {
 		frame.setResizable(false);
 		frame.setName("frame");
 		frame.setBounds(100, 100, 1280, 720);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame.getContentPane().setLayout(new BorderLayout(0, 0));
 
 		JPanel panel = new JPanel();
@@ -164,11 +168,13 @@ public class CreateImportOrderView implements Observer {
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		table.getTableHeader().setReorderingAllowed(false);
 		table.setRowHeight(50);
+
+		// end custom by Minh
 		scrollPane.setViewportView(table);
+
 		controller = new ProcessOrderController();
 
 		initTable();
-		// end custom by Minh
 
 	}
 
